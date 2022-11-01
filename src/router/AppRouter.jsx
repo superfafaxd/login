@@ -6,12 +6,17 @@ import { AuthWithPhoneNumber } from "../auth/pages/AuthWithPhoneNumber";
 import { RegisterPage } from "../auth/pages/RegisterPage";
 import { HomeRoutes } from "../Home/routes/HomeRoutes";
 import { useCheckAuth } from "../hooks/useCheckAuth";
+import { CkeckingAuth } from "../ui/components/CkeckingAuth";
 
 
 export const AppRouter = () => {
     //const status = 'not-authenticated';
     //const status = 'authenticated';
     const status = useCheckAuth();
+    if(status === 'checking'){
+        return  <CkeckingAuth />
+    }
+
     return (
         <Routes>
             {

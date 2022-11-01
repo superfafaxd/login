@@ -22,7 +22,7 @@ export const useAuthStore = () => {
 
     const startSignInWithGoogle = async () => {
         try {
-            dispatch(checkingCredentials)
+            dispatch(checkingCredentials())
             const result = await signInWithPopup(FirebaseAuth, googleProvider);
             const { displayName, email, photoURL, uid } = result.user;
             console.log({ displayName, email, photoURL, uid })
@@ -73,6 +73,7 @@ export const useAuthStore = () => {
 
     const startRegisterWithEmailPassword = async ({ email, password, displayname }) => {
         try {
+            dispatch(checkingCredentials())
             const resp = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
             const { uid, photoURL } = resp.user;
             console.log(uid, photoURL)
@@ -85,7 +86,7 @@ export const useAuthStore = () => {
 
     const startLoginWithEmailPassword = async ({ email, password }) => {
         try {
-            dispatch(checkingCredentials)
+            dispatch(checkingCredentials())
             const resp = await signInWithEmailAndPassword(FirebaseAuth, email, password);
             const { uid, photoURL, displayName } = resp.user;
             console.log({ uid, photoURL, displayName })
@@ -97,6 +98,7 @@ export const useAuthStore = () => {
 
     const startLogout = async () => {
         try {
+            dispatch(checkingCredentials())
             await FirebaseAuth.signOut();
             dispatch(logout({}));
         } catch (error) {
