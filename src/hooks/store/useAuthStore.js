@@ -13,7 +13,7 @@ import {
 
 import { useDispatch } from "react-redux";
 import { FirebaseAuth } from "../../firebase/config"
-import { checkingCredentials, login, logout } from "../../store/auth/authSlice";
+import { checkingCredentials, login, logout, onSetError } from "../../store/auth/authSlice";
 
 
 export const useAuthStore = () => {
@@ -46,6 +46,7 @@ export const useAuthStore = () => {
         );
         
         recaptchaVerifier.render();
+        //recaptchaVerifier.clear()
         //console.log(  recaptchaVerifier)
         return recaptchaVerifier
     }
@@ -66,7 +67,11 @@ export const useAuthStore = () => {
             console.log('feli por que se funciono');
         } catch (error) {
             console.log(error)
-            throw error
+            const errorCode = error.code
+            console.log('Error Code ' + errorCode);
+            const errorMessage = error.message;
+            console.log(errorMessage)
+            dispatch(onSetError(errorMessage))
         }
     }
 

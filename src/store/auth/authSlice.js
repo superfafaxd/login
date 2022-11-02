@@ -10,11 +10,11 @@ export const authSlice = createSlice({
         photoURL: null,
         number: null,
         errorMessage: null,
-        user:{},
+        user: {},
         recaptcha: ''
     },
     reducers: {
-        login: (state, { payload } ) => {
+        login: (state, { payload }) => {
             state.status = 'authenticated';
             state.uid = payload.uid;
             state.email = payload.email;
@@ -25,22 +25,25 @@ export const authSlice = createSlice({
         },
         logout: (state, { payload }) => {
             state.status = 'not-authenticated', //'checking', 'not-authenticated', 'authenticated'
-            state.uid = null;
+                state.uid = null;
             state.email = null;
             state.displayName = null;
             state.photoURL = null;
-            state.number =null;
+            state.number = null;
             state.errorMessage = payload?.errorMessage;
         },
         checkingCredentials: (state) => {
             state.status = 'checking'
         },
-        setRecaptcha: ( state, {payload}) =>{
+        setRecaptcha: (state, { payload }) => {
             state.recaptcha = payload
+        },
+        onSetError: (state, { payload }) => {
+            state.errorMessage = payload;
         }
     }
 });
 
 
 // Action creators are generated for each case reducer function
-export const { login, logout, checkingCredentials, setRecaptcha } = authSlice.actions;
+export const { login, logout, checkingCredentials, setRecaptcha, onSetError } = authSlice.actions;

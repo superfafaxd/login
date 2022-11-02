@@ -2,91 +2,134 @@ import { useForm } from '../../hooks/useForm'
 import './styles2.css'
 import { useAuthStore } from '../../hooks/store/useAuthStore';
 import { useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
+//import queryString from 'query-string';
 import { FirebaseAuth } from '../../firebase/config';
-import { RecaptchaVerifier } from 'firebase/auth';
 import { useDispatch, useSelector } from 'react-redux';
-import {  setRecaptcha } from '../../store/auth/authSlice';
-
+import { setRecaptcha, onSetError } from '../../store/auth/authSlice';
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+import { AlertError } from '../../ui/components/AlertError';
 
 const loginFormFields = {
-    numero: '+52 375 118 8753',
-    codigoVerificacion: '123456'
+    //'+52 375 118 8753',
+    codigoVerificacion: '123456',
+    //searchText: q
 }
+
 export const AuthWithPhoneNumber = () => {
     const dispatch = useDispatch()
-    
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    //Numero en query parameter
+    //const { q = '' } = queryString.parse(location.search);
+
+   //const {searchTex, onInputChange: onInputChangeNumber} = useForm({searchText: q});
+    //--------------------------------------------------------------------
+
+    const { errorMessage } = useSelector(state => state.auth);
+
     const { recaptcha } = useSelector(state => state.auth);
-    const { numero, codigoVerificacion, onInputChange } = useForm(loginFormFields);
+    const { codigoVerificacion, onInputChange } = useForm(loginFormFields);
     const { setUpRecaptcha, verify, sendMessage } = useAuthStore();
     const [hiddenFormConfirm, setHiddenFormConfirm] = useState(true)
     const [hiddenFormNumber, setHiddenFormNumber] = useState(false)
     const [confirmObj, setConfirmObj] = useState("");
-    //let recaptchaVerifier = RecaptchaVerifier 
-    //let recaptchaVerifier = [] 
-
+    const [number, setNumber] = useState("+52 375 118 8753");
+    const [loadingSendMessage, setLoadingSendMessage] = useState(true)
     //-----------------------------------------------------------------------------
+
 
     const onSubmitSMS = async (event) => {
         event.preventDefault();
-        if (numero === "" || numero === undefined) return
+        if (number === "" || number === undefined) return
         try {
             //const response = await setUpRecaptcha(numero);
             //console.log(response)
             const recaptchaVerifier = await setUpRecaptcha(/* numero */);
             dispatch(setRecaptcha(recaptchaVerifier))
             console.log(recaptchaVerifier)
-            const response = await sendMessage(numero, FirebaseAuth, recaptchaVerifier);
+            setLoadingSendMessage(false) //muestra el loader en el boton al enviar el mensaje
+            const response = await sendMessage(number, FirebaseAuth, recaptchaVerifier);
+            setLoadingSendMessage(true) //oculta el loader en el boton al enviar el mensaje
             setConfirmObj(response)
             setHiddenFormNumber(true)
             setHiddenFormConfirm(false)
-        } catch (err) {
-            console.log('error ptm ' + err)
-            throw err
+        } catch (error) {
+            console.log('error ptm ' + error)
+            const errorCode = error.code
+            console.log('Error Code ' + errorCode);
+            const errorMessage = error.message;
+            console.log('Error Message' + errorMessage)
+            setConfirmObj("")
+            dispatch(setRecaptcha(""))
+            dispatch(onSetError(errorMessage))
         }
-        console.log(numero)
+        console.log(number)
     }
 
-    const reSendCode =async () => {
-        await sendMessage(numero, FirebaseAuth, recaptcha);
-  
+    const reSendCode = async () => {
+        await sendMessage(number, FirebaseAuth, recaptcha);
+
 
     }
 
     const onSubmit = async (event) => {
         event.preventDefault();
+        if (codigoVerificacion === "" || codigoVerificacion === undefined) return
         console.log(codigoVerificacion)
         dispatch(setRecaptcha(""))
         verify(confirmObj, codigoVerificacion);
 
     }
 
+  
 
     return (
         <div >
             <h3>Login</h3>
+
             <form onSubmit={onSubmitSMS} hidden={hiddenFormNumber}>
 
+
                 <div className="form-group mb-2">
-                    <input
+                    <PhoneInput
+                        international
+                        // defaultCountry="US"
+                        placeholder="Ingresa tu numero"
+                        value={number}
+                        onChange={setNumber} />
+                    {/* <input
                         type="text"
                         className="form-control"
                         placeholder="Numero"
                         name='numero'
                         value={numero}
                         onChange={onInputChange}
-                    />
+                    /> */}
                 </div>
 
                 <div className="d-grid gap-2">
-                    <input
+                    {/* <input
                         type="submit"
                         className="btn btn-secondary"
                         name='btn-enviarSMS'
                         value='Enviar SMS'
-                    />
+                    /> */}
+                    <button
+                        type="submit"
+                        className="btn btn-secondary"
+                        name='btn-enviarSMS'
+                        value='Enviar SMS'
+                    >
+                        Enviar SMS
+                        &nbsp;
+                        <span hidden={loadingSendMessage} className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    </button>
                 </div>
-            </form>
+
+            </form >
 
             <form onSubmit={onSubmit} hidden={hiddenFormConfirm}>
                 <div className="form-group mb-2">
@@ -114,15 +157,13 @@ export const AuthWithPhoneNumber = () => {
                 </div>
                 <button type="button" className="btn btn-primary" onClick={reSendCode} >Reenviar Codigo</button>
 
-                {/* <div className="d-flex justify-content-end mt-3">
-                    <span>Cambiar de numero</span>
-                    <div className="me-2"></div>
-                    
-                </div> */}
-
             </form>
+
             <div id='captcha'></div>
-        </div>
+            {
+                (errorMessage != null) ? <AlertError mensaje="error" errorMessage={errorMessage} /> : <></>
+            }
+        </div >
 
     )
 }
