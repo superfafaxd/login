@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useDispatch } from "react-redux"
-import {Link, NavLink } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 import { useAuthStore } from "../../hooks/store/useAuthStore"
 import { useForm } from "../../hooks/useForm"
 import './styles2.css'
@@ -12,28 +12,29 @@ const initialFormFields = {
   passwordConfirm: ''
 }
 const formValidations = {
-  displayName:  [(value) => value.length >= 4, 'El Nombre debe de tener mas de 4 letras'],
+  displayName: [(value) => value.length >= 4, 'El Nombre debe de tener mas de 4 letras'],
   email: [(value) => value.includes('@'), 'El Corro no es valido'],
-  password:  [(value) => value.length >= 6, 'El password debe de tener mas de 6 letras'],
-  passwordConfirm:  [(value) => value.length >= 6, 'El password debe de tener mas de 6 letras']
+  password: [(value) => value.length >= 6, 'El password debe de tener mas de 6 letras'],
+  passwordConfirm: [(value) => value.length >= 6, 'El password debe de tener mas de 6 letras']
 }
 export const RegisterPage = () => {
   const dispatch = useDispatch();
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  const {formState, displayName, email, password, passwordConfirm, onInputChange,
-     isFormValid,displayNameValid, emailValid, passwordValid, passwordConfirmValid} = useForm(initialFormFields, formValidations);
+  const { formState, displayName, email, password, passwordConfirm, onInputChange,
+    isFormValid, displayNameValid, emailValid, passwordValid, passwordConfirmValid
+  } = useForm(initialFormFields, formValidations);
 
-     const { startRegisterWithEmailPassword } = useAuthStore();
+  const { startRegisterWithEmailPassword } = useAuthStore();
 
   const onSubmitForm = (event) => {
     event.preventDefault();
     setFormSubmitted(true);
-    if(!isFormValid){
-      console.log({displayNameValid, emailValid, passwordValid, passwordConfirmValid})
+    if (!isFormValid) {
+      console.log({ displayNameValid, emailValid, passwordValid, passwordConfirmValid })
       return
-    } 
-    console.log( {displayName, email, password, passwordConfirm})
+    }
+    console.log({ displayName, email, password, passwordConfirm })
     startRegisterWithEmailPassword(formState)
   }
 
@@ -92,8 +93,8 @@ export const RegisterPage = () => {
         </div>
 
         <div className="d-flex justify-content-end mt-3">
-        <span>Ya Tienes Cuenta?</span>
-        <div className="me-2"></div>
+          <span>Ya Tienes Cuenta?</span>
+          <div className="me-2"></div>
           <NavLink to='/auth/login'  >Ingresar</NavLink>
         </div>
       </form>

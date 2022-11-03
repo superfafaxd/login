@@ -13,6 +13,7 @@ import {
 
 import { useDispatch } from "react-redux";
 import { FirebaseAuth } from "../../firebase/config"
+import { getErrorMessage } from "../../helpers/getErrorMessage";
 import { checkingCredentials, login, logout, onSetError } from "../../store/auth/authSlice";
 
 
@@ -45,9 +46,8 @@ export const useAuthStore = () => {
             FirebaseAuth
         );
         
-        recaptchaVerifier.render();
+       // recaptchaVerifier.render();
         //recaptchaVerifier.clear()
-        //console.log(  recaptchaVerifier)
         return recaptchaVerifier
     }
 
@@ -91,13 +91,25 @@ export const useAuthStore = () => {
 
     const startLoginWithEmailPassword = async ({ email, password }) => {
         try {
-            dispatch(checkingCredentials())
+            //dispatch(checkingCredentials())
             const resp = await signInWithEmailAndPassword(FirebaseAuth, email, password);
             const { uid, photoURL, displayName } = resp.user;
             console.log({ uid, photoURL, displayName })
 
         } catch (error) {
+             //const errorMessage = error.message;
+            // console.log(errorMessage)
+            const errorCode = error.code;
+            console.log('Error Code: ' +errorCode)
+            const xd = getErrorMessage(errorCode)
+           // console.log(xd[0].message )
+            if(!xd){
+                dispatch(onSetError(errorCode))
+            }else{
+                 dispatch(onSetError(xd[0].message))
+            }
             console.log('Error en la autentificacion ' + error)
+           
         }
     }
 

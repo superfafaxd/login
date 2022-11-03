@@ -3,29 +3,26 @@ import './styles2.css'
 import { useAuthStore } from '../../hooks/store/useAuthStore';
 import { useState } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-//import queryString from 'query-string';
+import queryString from 'query-string';
 import { FirebaseAuth } from '../../firebase/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setRecaptcha, onSetError } from '../../store/auth/authSlice';
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 import { AlertError } from '../../ui/components/AlertError';
+import { getErrorMessage } from '../../helpers/getErrorMessage';
 
 const loginFormFields = {
     //'+52 375 118 8753',
     codigoVerificacion: '123456',
-    //searchText: q
 }
-
 export const AuthWithPhoneNumber = () => {
     const dispatch = useDispatch()
 
     const navigate = useNavigate();
     const location = useLocation();
     //Numero en query parameter
-    //const { q = '' } = queryString.parse(location.search);
-
-   //const {searchTex, onInputChange: onInputChangeNumber} = useForm({searchText: q});
+    const { num = '' } = queryString.parse(location.search);
     //--------------------------------------------------------------------
 
     const { errorMessage } = useSelector(state => state.auth);
@@ -44,12 +41,13 @@ export const AuthWithPhoneNumber = () => {
     const onSubmitSMS = async (event) => {
         event.preventDefault();
         if (number === "" || number === undefined) return
+        navigate(`?num=${number.replace(/\s+/g, '')}`) //replace(/\s+/g, '') //esto se encarga de quitar los espacios en blanco
+        let recaptchaVerifier =''; //codigo de prueba
         try {
-            //const response = await setUpRecaptcha(numero);
-            //console.log(response)
-            const recaptchaVerifier = await setUpRecaptcha(/* numero */);
+             recaptchaVerifier = await setUpRecaptcha(/* numero */);
+            recaptchaVerifier.render();
             dispatch(setRecaptcha(recaptchaVerifier))
-            console.log(recaptchaVerifier)
+           // console.log(recaptchaVerifier)
             setLoadingSendMessage(false) //muestra el loader en el boton al enviar el mensaje
             const response = await sendMessage(number, FirebaseAuth, recaptchaVerifier);
             setLoadingSendMessage(true) //oculta el loader en el boton al enviar el mensaje
@@ -61,13 +59,15 @@ export const AuthWithPhoneNumber = () => {
             const errorCode = error.code
             console.log('Error Code ' + errorCode);
             const errorMessage = error.message;
-            console.log('Error Message' + errorMessage)
+            console.log('Error Message ' + errorMessage)
+            //recaptchaVerifier.clear() //codigo de prueba
             setConfirmObj("")
             dispatch(setRecaptcha(""))
             dispatch(onSetError(errorMessage))
         }
-        console.log(number)
     }
+
+   
 
     const reSendCode = async () => {
         await sendMessage(number, FirebaseAuth, recaptcha);
@@ -83,8 +83,7 @@ export const AuthWithPhoneNumber = () => {
         verify(confirmObj, codigoVerificacion);
 
     }
-
-  
+ 
 
     return (
         <div >
@@ -92,12 +91,12 @@ export const AuthWithPhoneNumber = () => {
 
             <form onSubmit={onSubmitSMS} hidden={hiddenFormNumber}>
 
-
                 <div className="form-group mb-2">
                     <PhoneInput
                         international
                         // defaultCountry="US"
                         placeholder="Ingresa tu numero"
+                        name='numer'
                         value={number}
                         onChange={setNumber} />
                     {/* <input
@@ -123,7 +122,7 @@ export const AuthWithPhoneNumber = () => {
                         name='btn-enviarSMS'
                         value='Enviar SMS'
                     >
-                        Enviar SMS
+                        Send SMS
                         &nbsp;
                         <span hidden={loadingSendMessage} className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                     </button>
@@ -155,7 +154,7 @@ export const AuthWithPhoneNumber = () => {
 
                     />
                 </div>
-                <button type="button" className="btn btn-primary" onClick={reSendCode} >Reenviar Codigo</button>
+                <button type="button" className="btn btn-primary" onClick={reSendCode} >Reesend Code</button>
 
             </form>
 
