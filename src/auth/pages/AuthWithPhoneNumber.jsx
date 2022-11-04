@@ -6,10 +6,12 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import { FirebaseAuth } from '../../firebase/config';
 import { useDispatch, useSelector } from 'react-redux';
-import { setRecaptcha, onSetError } from '../../store/auth/authSlice';
+import { setRecaptcha, onSetError, onResetError } from '../../store/auth/authSlice';
 import 'react-phone-number-input/style.css'
 import PhoneInput from 'react-phone-number-input'
 import { AlertError } from '../../ui/components/AlertError';
+import Swal from 'sweetalert2';
+import "bootstrap-icons/font/bootstrap-icons.css";
 import { getErrorMessage } from '../../helpers/getErrorMessage';
 
 const loginFormFields = {
@@ -21,19 +23,20 @@ export const AuthWithPhoneNumber = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+
     //Numero en query parameter
-    const { num = '' } = queryString.parse(location.search);
+    const { num } = queryString.parse(location.search);
     //--------------------------------------------------------------------
 
     const { errorMessage } = useSelector(state => state.auth);
 
     const { recaptcha } = useSelector(state => state.auth);
     const { codigoVerificacion, onInputChange } = useForm(loginFormFields);
-    const { setUpRecaptcha, verify, sendMessage } = useAuthStore();
+    const { setUpRecaptcha, verify, sendMessage, onError } = useAuthStore();
     const [hiddenFormConfirm, setHiddenFormConfirm] = useState(true)
     const [hiddenFormNumber, setHiddenFormNumber] = useState(false)
-    const [confirmObj, setConfirmObj] = useState("");
-    const [number, setNumber] = useState("+52 375 118 8753");
+    const [confirmObj, setConfirmObj] = useState('');
+    const [number, setNumber] = useState('+' + num);//+52 375 118 8753
     const [loadingSendMessage, setLoadingSendMessage] = useState(true)
     //-----------------------------------------------------------------------------
 
@@ -42,51 +45,78 @@ export const AuthWithPhoneNumber = () => {
         event.preventDefault();
         if (number === "" || number === undefined) return
         navigate(`?num=${number.replace(/\s+/g, '')}`) //replace(/\s+/g, '') //esto se encarga de quitar los espacios en blanco
-        let recaptchaVerifier =''; //codigo de prueba
         try {
-             recaptchaVerifier = await setUpRecaptcha(/* numero */);
-            recaptchaVerifier.render();
+           const  recaptchaVerifier = await setUpRecaptcha(/* numero */);
             dispatch(setRecaptcha(recaptchaVerifier))
-           // console.log(recaptchaVerifier)
+            // console.log(recaptchaVerifier)
             setLoadingSendMessage(false) //muestra el loader en el boton al enviar el mensaje
             const response = await sendMessage(number, FirebaseAuth, recaptchaVerifier);
+            console.log(response)
             setLoadingSendMessage(true) //oculta el loader en el boton al enviar el mensaje
             setConfirmObj(response)
             setHiddenFormNumber(true)
             setHiddenFormConfirm(false)
         } catch (error) {
+             setNumber(num);
             console.log('error ptm ' + error)
             const errorCode = error.code
             console.log('Error Code ' + errorCode);
             const errorMessage = error.message;
             console.log('Error Message ' + errorMessage)
-            //recaptchaVerifier.clear() //codigo de prueba
+
+            const ifErr = getErrorMessage(errorCode)
+            if(!ifErr){
+                 ifError(errorCode, errorMessage)
+            }else{
+                ifError(errorCode, ifErr[0].message)
+            }
+           
+            //window.location.reload()
             setConfirmObj("")
             dispatch(setRecaptcha(""))
             dispatch(onSetError(errorMessage))
         }
     }
 
-   
+    const ifError = (errorCode = '', errorMessage = '') => {
+        if (errorMessage != null) {
+            Swal.fire({
+                title: `${errorCode}`,
+                text: `${errorMessage}`,
+                icon: 'error',
+                //showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                //cancelButtonColor: '#d33',
+                confirmButtonText: 'OK'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('okis')
+                    window.location.reload()
+                }
+              })
+            //Swal.fire(`${errorCode}`, `${errorMessage}`, 'error');
+           
+            //return
+        }
+    }
 
     const reSendCode = async () => {
         await sendMessage(number, FirebaseAuth, recaptcha);
-
-
     }
 
     const onSubmit = async (event) => {
         event.preventDefault();
         if (codigoVerificacion === "" || codigoVerificacion === undefined) return
-        console.log(codigoVerificacion)
         dispatch(setRecaptcha(""))
         verify(confirmObj, codigoVerificacion);
 
     }
- 
+
 
     return (
         <div >
+           <NavLink  className="nav-link bi bi-arrow-left" to='/auth/login'>Regresar </NavLink>
+           
             <h3>Login</h3>
 
             <form onSubmit={onSubmitSMS} hidden={hiddenFormNumber}>
@@ -110,12 +140,6 @@ export const AuthWithPhoneNumber = () => {
                 </div>
 
                 <div className="d-grid gap-2">
-                    {/* <input
-                        type="submit"
-                        className="btn btn-secondary"
-                        name='btn-enviarSMS'
-                        value='Enviar SMS'
-                    /> */}
                     <button
                         type="submit"
                         className="btn btn-secondary"
@@ -162,6 +186,8 @@ export const AuthWithPhoneNumber = () => {
             {
                 (errorMessage != null) ? <AlertError mensaje="error" errorMessage={errorMessage} /> : <></>
             }
+
+
         </div >
 
     )

@@ -45,14 +45,15 @@ export const useAuthStore = () => {
             { 'size': 'invisible' },
             FirebaseAuth
         );
-        
-       // recaptchaVerifier.render();
+
+        //recaptchaVerifier.render();
         //recaptchaVerifier.clear()
         return recaptchaVerifier
     }
 
-    const sendMessage = async(number, FirebaseAuth, recaptchaVerifier) =>{
-        return signInWithPhoneNumber(FirebaseAuth, number, recaptchaVerifier);
+
+    const sendMessage = async (number, FirebaseAuth, recaptchaVerifier) => {
+        return await signInWithPhoneNumber(FirebaseAuth, number, recaptchaVerifier);
     }
 
     const verify = async (confirmObj, codigoVerificacion) => {
@@ -78,14 +79,29 @@ export const useAuthStore = () => {
 
     const startRegisterWithEmailPassword = async ({ email, password, displayname }) => {
         try {
-            dispatch(checkingCredentials())
+            //dispatch(checkingCredentials())
             const resp = await createUserWithEmailAndPassword(FirebaseAuth, email, password);
             const { uid, photoURL } = resp.user;
             console.log(uid, photoURL)
             console.log(resp)
             await updateProfile(FirebaseAuth.currentUser, { displayname })
         } catch (error) {
-            console.log("error al registrar usuario " + error) 
+            const errorCode = error.code
+            console.log('Error Code: ' + errorCode);
+            const errorMessage = error.message;
+            console.log('Error Message: ' + errorMessage)
+            onError(errorCode)
+            console.log("Error al registrar usuario " + error)
+        }
+    }
+
+    const onError = (errorCode) => {
+        const xd = getErrorMessage(errorCode)
+        // console.log(xd[0].message )
+        if (!xd) {
+            dispatch(onSetError(errorCode))
+        } else {
+            dispatch(onSetError(xd[0].message))
         }
     }
 
@@ -95,21 +111,20 @@ export const useAuthStore = () => {
             const resp = await signInWithEmailAndPassword(FirebaseAuth, email, password);
             const { uid, photoURL, displayName } = resp.user;
             console.log({ uid, photoURL, displayName })
-
         } catch (error) {
-             //const errorMessage = error.message;
+            //const errorMessage = error.message;
             // console.log(errorMessage)
             const errorCode = error.code;
-            console.log('Error Code: ' +errorCode)
+            console.log('Error Code: ' + errorCode)
             const xd = getErrorMessage(errorCode)
-           // console.log(xd[0].message )
-            if(!xd){
+            // console.log(xd[0].message )
+            if (!xd) {
                 dispatch(onSetError(errorCode))
-            }else{
-                 dispatch(onSetError(xd[0].message))
+            } else {
+                dispatch(onSetError(xd[0].message))
             }
             console.log('Error en la autentificacion ' + error)
-           
+
         }
     }
 
@@ -133,6 +148,7 @@ export const useAuthStore = () => {
         startLoginWithEmailPassword,
         startSignInWithGoogle,
         sendMessage,
+        onError,
     }
 }
 

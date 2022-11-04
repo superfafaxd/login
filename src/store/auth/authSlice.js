@@ -40,10 +40,20 @@ export const authSlice = createSlice({
         },
         onSetError: (state, { payload }) => {
             state.errorMessage = payload;
+        },
+        onResetError: (state) => {
+            state.errorMessage = null
         }
     }
 });
 
 
 // Action creators are generated for each case reducer function
-export const { login, logout, checkingCredentials, setRecaptcha, onSetError } = authSlice.actions;
+export const {
+    login,
+    logout,
+    checkingCredentials,
+    setRecaptcha,
+    onSetError,
+    onResetError
+} = authSlice.actions;

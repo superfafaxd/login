@@ -1,7 +1,7 @@
 {
   "name": "firebase",
   "private": true,
-  "version": "1.0.10",
+  "version": "1.0.20",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,14 +11,18 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.8.6",
+    "bootstrap-icons": "^1.9.1",
     "firebase": "^9.12.1",
+    "mdb-react-ui-kit": "^5.0.0",
+    "mdb-ui-kit": "^6.0.0",
     "query-string": "^7.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-phone-input-2": "^2.15.1",
     "react-phone-number-input": "^3.2.12",
     "react-redux": "^8.0.4",
-    "react-router-dom": "6"
+    "react-router-dom": "6",
+    "sweetalert2": "^11.6.5"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
