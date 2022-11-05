@@ -25,7 +25,7 @@ export const AuthWithPhoneNumber = () => {
     const location = useLocation();
 
     //Numero en query parameter
-    const { num } = queryString.parse(location.search);
+    const { num = '' } = queryString.parse(location.search);
     //--------------------------------------------------------------------
 
     const { errorMessage } = useSelector(state => state.auth);
@@ -35,8 +35,8 @@ export const AuthWithPhoneNumber = () => {
     const { setUpRecaptcha, verify, sendMessage, onError } = useAuthStore();
     const [hiddenFormConfirm, setHiddenFormConfirm] = useState(true)
     const [hiddenFormNumber, setHiddenFormNumber] = useState(false)
-    const [confirmObj, setConfirmObj] = useState('');
-    const [number, setNumber] = useState('+' + num);//+52 375 118 8753
+    const [confirmObj, setConfirmObj] = useState(num);
+    const [number, setNumber] = useState('');//+52 375 118 8753
     const [loadingSendMessage, setLoadingSendMessage] = useState(true)
     //-----------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ export const AuthWithPhoneNumber = () => {
             setHiddenFormNumber(true)
             setHiddenFormConfirm(false)
         } catch (error) {
-             setNumber(num);
+            // setNumber(num);
             console.log('error ptm ' + error)
             const errorCode = error.code
             console.log('Error Code ' + errorCode);
@@ -121,14 +121,15 @@ export const AuthWithPhoneNumber = () => {
 
             <form onSubmit={onSubmitSMS} hidden={hiddenFormNumber}>
 
-                <div className="form-group mb-2">
+                <div className="mb-2">
                     <PhoneInput
-                        international
-                        // defaultCountry="US"
+                       // international
+                         defaultCountry="MX"
                         placeholder="Ingresa tu numero"
                         name='numer'
                         value={number}
-                        onChange={setNumber} />
+                        onChange={setNumber}
+                        />
                     {/* <input
                         type="text"
                         className="form-control"
