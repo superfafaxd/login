@@ -7,12 +7,12 @@ import queryString from 'query-string';
 import { FirebaseAuth } from '../../firebase/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setRecaptcha, onSetError, onResetError } from '../../store/auth/authSlice';
- //import 'react-phone-number-input/style.css'
- //import PhoneInput from 'react-phone-number-input'
+ import 'react-phone-number-input/style.css'
+ import PhoneInput from 'react-phone-number-input'
  //----------------------------------------------------
-import PhoneInput from "react-phone-input-2";
+//import PhoneInput from "react-phone-input-2";
 //import "react-phone-input-2/lib/bootstrap.css"; //libreria secundaria
-import './stylesPhoneNumber.css'
+//import './stylesPhoneNumber.css'
 //-----------------------------------------------------
 import { AlertError } from '../../ui/components/AlertError';
 import Swal from 'sweetalert2';
@@ -48,9 +48,7 @@ export const AuthWithPhoneNumber = () => {
 
     const onSubmitSMS = async (event) => {
         event.preventDefault();
-        // console.log(number)
-        // const n = (`+${number}`)
-        // console.log(n)
+        
         if (number === "" || number === undefined) return
         navigate(`?num=${number.replace(/\s+/g, '')}`) //replace(/\s+/g, '') //esto se encarga de quitar los espacios en blanco
         try {
@@ -58,7 +56,7 @@ export const AuthWithPhoneNumber = () => {
             dispatch(setRecaptcha(recaptchaVerifier))
             // console.log(recaptchaVerifier)
             setLoadingSendMessage(false) //muestra el loader en el boton al enviar el mensaje
-            const response = await sendMessage(`+${number}`, FirebaseAuth, recaptchaVerifier);
+            const response = await sendMessage(number, FirebaseAuth, recaptchaVerifier);
             console.log(response)
             setLoadingSendMessage(true) //oculta el loader en el boton al enviar el mensaje
             setConfirmObj(response)
@@ -109,7 +107,7 @@ export const AuthWithPhoneNumber = () => {
     }
 
     const reSendCode = async () => {
-        await sendMessage(`+${number}`, FirebaseAuth, recaptcha);
+        await sendMessage(number, FirebaseAuth, recaptcha);
     }
 
     const onSubmit = async (event) => {
@@ -132,14 +130,14 @@ export const AuthWithPhoneNumber = () => {
                 <div className="mb-2">
                     <PhoneInput
                          //international
-                        //defaultCountry="MX"
-                        enableSearch
-                        autocompleteSearch
+                        defaultCountry="MX"
+                       // enableSearch
+                        //autocompleteSearch
                         placeholder="Ingresa tu numero"
                         name='numer'
                         value={number}
                         onChange={setNumber}
-                        onEnterKeyPress={onSubmitSMS}
+                        //onEnterKeyPress={onSubmitSMS}
 
                     />
                     {/* <input
