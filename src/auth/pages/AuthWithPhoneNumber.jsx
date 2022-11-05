@@ -7,8 +7,13 @@ import queryString from 'query-string';
 import { FirebaseAuth } from '../../firebase/config';
 import { useDispatch, useSelector } from 'react-redux';
 import { setRecaptcha, onSetError, onResetError } from '../../store/auth/authSlice';
-import 'react-phone-number-input/style.css'
-import PhoneInput from 'react-phone-number-input'
+ //import 'react-phone-number-input/style.css'
+ //import PhoneInput from 'react-phone-number-input'
+ //----------------------------------------------------
+import PhoneInput from "react-phone-input-2";
+//import "react-phone-input-2/lib/bootstrap.css"; //libreria secundaria
+import './stylesPhoneNumber.css'
+//-----------------------------------------------------
 import { AlertError } from '../../ui/components/AlertError';
 import Swal from 'sweetalert2';
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -25,7 +30,7 @@ export const AuthWithPhoneNumber = () => {
     const location = useLocation();
 
     //Numero en query parameter
-    const { num = '' } = queryString.parse(location.search);
+    const { num = '+' } = queryString.parse(location.search);
     //--------------------------------------------------------------------
 
     const { errorMessage } = useSelector(state => state.auth);
@@ -35,7 +40,7 @@ export const AuthWithPhoneNumber = () => {
     const { setUpRecaptcha, verify, sendMessage, onError } = useAuthStore();
     const [hiddenFormConfirm, setHiddenFormConfirm] = useState(true)
     const [hiddenFormNumber, setHiddenFormNumber] = useState(false)
-    const [confirmObj, setConfirmObj] = useState(num);
+    const [confirmObj, setConfirmObj] = useState('');
     const [number, setNumber] = useState('');//+52 375 118 8753
     const [loadingSendMessage, setLoadingSendMessage] = useState(true)
     //-----------------------------------------------------------------------------
@@ -43,14 +48,17 @@ export const AuthWithPhoneNumber = () => {
 
     const onSubmitSMS = async (event) => {
         event.preventDefault();
+        // console.log(number)
+        // const n = (`+${number}`)
+        // console.log(n)
         if (number === "" || number === undefined) return
         navigate(`?num=${number.replace(/\s+/g, '')}`) //replace(/\s+/g, '') //esto se encarga de quitar los espacios en blanco
         try {
-           const  recaptchaVerifier = await setUpRecaptcha(/* numero */);
+            const recaptchaVerifier = await setUpRecaptcha(/* numero */);
             dispatch(setRecaptcha(recaptchaVerifier))
             // console.log(recaptchaVerifier)
             setLoadingSendMessage(false) //muestra el loader en el boton al enviar el mensaje
-            const response = await sendMessage(number, FirebaseAuth, recaptchaVerifier);
+            const response = await sendMessage(`+${number}`, FirebaseAuth, recaptchaVerifier);
             console.log(response)
             setLoadingSendMessage(true) //oculta el loader en el boton al enviar el mensaje
             setConfirmObj(response)
@@ -65,12 +73,12 @@ export const AuthWithPhoneNumber = () => {
             console.log('Error Message ' + errorMessage)
 
             const ifErr = getErrorMessage(errorCode)
-            if(!ifErr){
-                 ifError(errorCode, errorMessage)
-            }else{
+            if (!ifErr) {
+                ifError(errorCode, errorMessage)
+            } else {
                 ifError(errorCode, ifErr[0].message)
             }
-           
+
             //window.location.reload()
             setConfirmObj("")
             dispatch(setRecaptcha(""))
@@ -88,20 +96,20 @@ export const AuthWithPhoneNumber = () => {
                 confirmButtonColor: '#3085d6',
                 //cancelButtonColor: '#d33',
                 confirmButtonText: 'OK'
-              }).then((result) => {
+            }).then((result) => {
                 if (result.isConfirmed) {
                     console.log('okis')
                     window.location.reload()
                 }
-              })
+            })
             //Swal.fire(`${errorCode}`, `${errorMessage}`, 'error');
-           
+
             //return
         }
     }
 
     const reSendCode = async () => {
-        await sendMessage(number, FirebaseAuth, recaptcha);
+        await sendMessage(`+${number}`, FirebaseAuth, recaptcha);
     }
 
     const onSubmit = async (event) => {
@@ -115,21 +123,25 @@ export const AuthWithPhoneNumber = () => {
 
     return (
         <div >
-           <NavLink  className="nav-link bi bi-arrow-left" to='/auth/login'>Regresar </NavLink>
-           
+            <NavLink className="nav-link bi bi-arrow-left" to='/auth/login'>Regresar </NavLink>
+
             <h3>Login</h3>
 
             <form onSubmit={onSubmitSMS} hidden={hiddenFormNumber}>
 
                 <div className="mb-2">
                     <PhoneInput
-                       // international
-                         defaultCountry="MX"
+                         //international
+                        //defaultCountry="MX"
+                        enableSearch
+                        autocompleteSearch
                         placeholder="Ingresa tu numero"
                         name='numer'
                         value={number}
                         onChange={setNumber}
-                        />
+                        onEnterKeyPress={onSubmitSMS}
+
+                    />
                     {/* <input
                         type="text"
                         className="form-control"
