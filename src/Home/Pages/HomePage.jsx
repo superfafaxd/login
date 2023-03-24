@@ -1,18 +1,28 @@
-import { useAuthStore } from '../../hooks/store/useAuthStore'
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { PageNotVerify } from '../../auth/pages/pageNotVerify';
+import { FirebaseAuth } from '../../firebase/config';
+import { HomeLayout } from '../../layout/home/HomeLayout';
 
 
 export const HomePage = () => {
-  const {startLogout } = useAuthStore();
-  const onSubmit = () => {
-    //dispatch(logout())
-    startLogout();
-    console.log('Logout exitoso')
-  }
+  // let provider
+  // const user = FirebaseAuth.currentUser;
+  // if (user !== null) {
+  //   const { providerData } = user
+  //   provider = providerData[0].providerId
+
+  // }
+  // console.log(provider)
+  
+ 
   return (
-    <div>
-      <h1>HomePage</h1>
-      <button onClick={ onSubmit} >logout</button>
-    </div>
+    <HomeLayout >
+      <div  >
+        <h1>HomePage</h1>
+       
+      </div>
+    </HomeLayout>
 
   )
 }

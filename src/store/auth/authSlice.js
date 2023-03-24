@@ -11,7 +11,9 @@ export const authSlice = createSlice({
         number: null,
         errorMessage: null,
         user: {},
-        recaptcha: ''
+        recaptcha: '',
+        userVerifyEmail: false,
+        provider: null
     },
     reducers: {
         login: (state, { payload }) => {
@@ -21,7 +23,11 @@ export const authSlice = createSlice({
             state.displayName = payload.displayName;
             state.photoURL = payload.photoURL;
             state.number = payload.number;
+            //state. userVerifyEmail = payload. userVerifyEmail
             state.errorMessage = payload?.errorMessage;
+            state.user = payload.user;
+            state.userVerifyEmail = payload.emailVerified;
+            state.provider = payload.provider;
         },
         logout: (state, { payload }) => {
             state.status = 'not-authenticated', //'checking', 'not-authenticated', 'authenticated'
@@ -31,6 +37,9 @@ export const authSlice = createSlice({
             state.photoURL = null;
             state.number = null;
             state.errorMessage = null;
+            state.user = {};
+            state.userVerifyEmail = false
+            state.provider = null
         },
         checkingCredentials: (state) => {
             state.status = 'checking'
@@ -43,6 +52,9 @@ export const authSlice = createSlice({
         },
         onResetError: (state) => {
             state.errorMessage = null
+        },
+        onUserVerifyEmail: (state, { payload}) =>{
+            state.userVerifyEmail = payload
         }
     }
 });
@@ -55,5 +67,6 @@ export const {
     checkingCredentials,
     setRecaptcha,
     onSetError,
-    onResetError
+    onResetError,
+    onUserVerifyEmail
 } = authSlice.actions;

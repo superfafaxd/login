@@ -14,7 +14,7 @@ export const AppRouter = () => {
     //const status = 'authenticated';
     const status = useCheckAuth();
     if(status === 'checking'){
-        return  <CkeckingAuth />
+        return  <CkeckingAuth  />
     }
 
     return (

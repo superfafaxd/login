@@ -1,5 +1,16 @@
+import { useSelector } from "react-redux"
+import { FirebaseAuth } from "../../firebase/config"
 
 export const CkeckingAuth = () => {
+
+  // const { userVerifyEmail } = useSelector(state => state.auth);
+
+  // if (!userVerifyEmail) {
+  //   setTimeout(() => {
+  //     window.location.reload()
+  //   }, 30);
+  // }
+
   return (
     <div className="container login-container">
       <div className='row d-flex justify-content-center' >
@@ -11,3 +22,5 @@ export const CkeckingAuth = () => {
     </div>
   )
 }
+
+

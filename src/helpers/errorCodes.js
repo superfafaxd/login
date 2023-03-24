@@ -36,7 +36,20 @@ export const errorsCodes = [
         errorCode: 'auth/quota-exceeded',
         message: 'Exceeded quota'
     }
+//Error Code: auth/missing-email
+//Error Message: Firebase: Error (auth/missing-email).
 
+//Error Code: auth/invalid-dynamic-link-domain
+// Error Message: Firebase: Error (auth/invalid-dynamic-link-domain).
+
+//Error Code: auth/invalid-continue-uri
+//Error Message: Firebase: Missing domain in continue url (auth/invalid-continue-uri)
+
+//Error Code: auth/unauthorized-continue-uri
+// Error Message: Firebase: Domain not whitelisted by project (auth/unauthorized-continue-uri)
+
+//Error Code: auth/argument-error
+// Error Message: Firebase: Error (auth/argument-error).
 ]
 /* 
 auth/invalid-phone-number
@@ -47,4 +60,39 @@ Firebase: TOO_LONG (auth/invalid-phone-number).
 //Firebase: Exceeded quota. (auth/quota-exceeded).
 
 
+/* 
+   sendSignInLinkToEmail(FirebaseAuth, email, actionCodeSettings)
+                    .then(() => {
+                        console.log('Email enviado')
+                        localStorage.setItem('emailForSignIn', email);
 
+                        if (isSignInWithEmailLink(FirebaseAuth)) {
+                            // let email = localStorage.getItem('emailForSignIn');
+                            // if (!email) {
+                            //     console.log('Ingresa correo para confirmar')
+                            // }
+                            signInWithEmailLink(FirebaseAuth, email)
+                                .then((result) => {
+                                    console.log('email verify?')
+                                    console.log(result)
+                                    dispatch(onUserVerifyEmail(false))
+                                    updateProfile(FirebaseAuth.currentUser, { displayname })
+                                })
+                                .catch((error) => {
+                                    const errorCode = error.code;
+                                    console.log('Error Code: ' + errorCode)
+                                    const errorMessage = error.message;
+                                    console.log('Error Message: ' + errorMessage)
+                                })
+
+                        }
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        console.log('Error Code: ' + errorCode)
+                        const errorMessage = error.message;
+                        console.log('Error Message: ' + errorMessage)
+                        return
+                    });
+
+*/

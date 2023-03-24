@@ -6,7 +6,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import { FirebaseAuth } from '../../firebase/config';
 import { useDispatch, useSelector } from 'react-redux';
-import { setRecaptcha, onSetError, onResetError } from '../../store/auth/authSlice';
+import { setRecaptcha, onSetError, onResetError, onUserVerifyEmail } from '../../store/auth/authSlice';
  import 'react-phone-number-input/style.css'
  import PhoneInput from 'react-phone-number-input'
  //----------------------------------------------------
@@ -48,7 +48,7 @@ export const AuthWithPhoneNumber = () => {
 
     const onSubmitSMS = async (event) => {
         event.preventDefault();
-        
+        //dispatch(onUserVerifyEmail(true))//esto pone como verificado el correo para cuando se ingresa con number
         if (number === "" || number === undefined) return
         navigate(`?num=${number.replace(/\s+/g, '')}`) //replace(/\s+/g, '') //esto se encarga de quitar los espacios en blanco
         try {
@@ -197,7 +197,9 @@ export const AuthWithPhoneNumber = () => {
             {
                 (errorMessage != null) ? <AlertError mensaje="error" errorMessage={errorMessage} /> : <></>
             }
-
+            <div className="alert alert-warning alert-dismissible fade show" role="alert">
+                <strong>NUMERO DE PRUEBA</strong> <br /> <span>+52 375 118 8753 codigo de verificacion 123456</span>
+            </div>
 
         </div >
 

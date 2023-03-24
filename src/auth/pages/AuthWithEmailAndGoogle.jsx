@@ -21,7 +21,7 @@ export const AuthWithEmailAndGoogle = () => {
         email, password, onInputChange,
         isFormValid, emailValid, passwordValid
     } = useForm(initialFormFields, formValidations);
-    const { startLoginWithEmailPassword, startSignInWithGoogle } = useAuthStore();
+    const { startLoginWithEmailPassword, startSignInWithGoogle, recoveryPassword } = useAuthStore();
     const { errorMessage } = useSelector(state => state.auth)
 
     const onSubmitForm = (event) => {
@@ -37,12 +37,14 @@ export const AuthWithEmailAndGoogle = () => {
     const onGoogleSignIn = () => {
         console.log('onGoogleSingIn');
         startSignInWithGoogle()
+
     }
 
     return (
 
         <div>
             <h3>Login</h3>
+            
             <form  /* className="was-validated" */ onSubmit={onSubmitForm}>
                 <div className="form-group mb-2" >
                     <input
@@ -94,9 +96,14 @@ export const AuthWithEmailAndGoogle = () => {
                         >TELEFONO</NavLink>
                     </div>
                 </div>
+                <div className="d-flex justify-content-between mt-3" >
+                    <div >
+                        <span>Olvidaste tu contraseña? <NavLink  onClick={recoveryPassword}  > Recuperar</NavLink></span>
+                    </div>
 
-                <div className="d-flex justify-content-end mt-3">
-                    <NavLink to='/auth/register'  > Crear una Cuenta</NavLink>
+                    <div>
+                        <NavLink to='/auth/register'  > Crear una Cuenta</NavLink>
+                    </div>
                 </div>
 
 
@@ -105,6 +112,11 @@ export const AuthWithEmailAndGoogle = () => {
             {
                 (errorMessage != null) ? <AlertError mensaje="error" errorMessage={errorMessage} /> : <></>
             }
+            <div className="alert alert-warning alert-dismissible fade show" role="alert">
+            <strong>EMAILS DE PRUEBA</strong> <br />
+            <span>VERIFICADO ferchos022199@hotmail.com PASS: 123456</span> <br />
+            <span>SIN VERIFICAR fafa1@google.com PASS: 123456</span>
+            </div>
         </div>
     )
 }
